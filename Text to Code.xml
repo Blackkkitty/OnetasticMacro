@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Macro name="Text to Code" category="Code" description="Converts selected text into Code table with line number and  font 'Consolas' ." version="20">
+  <Comment text="----------------------------------------------------------------------------------" />
+  <Comment text="    Text to Code" />
+  <Comment text="----------------------------------------------------------------------------------" />
+  <Expression>$Paragraphs = QueryObjects("Paragraph", GetCurrentPage())</Expression>
+  <Expression>$FirstParagraph = ""</Expression>
+  <ForEach var="Paragraph">
+    <Array>$Paragraphs</Array>
+    <If>
+      <Condition>$Paragraph.selection == "none"</Condition>
+      <Continue>1</Continue>
+    </If>
+    <If>
+      <Condition>($Paragraph.contentType != "text") || !$Paragraph.texts[0].selected</Condition>
+      <Continue>1</Continue>
+    </If>
+    <If>
+      <Condition>$FirstParagraph == ""</Condition>
+      <Expression>$FirstParagraph = $Paragraph</Expression>
+    </If>
+    <Expression>Array_PushBack($Texts, $Paragraph.text)</Expression>
+    <Expression>$Paragraph.text = ""</Expression>
+  </ForEach>
+  <If>
+    <Condition>!GetAncestorOfType($FirstParagraph, "Cell", $Parent)</Condition>
+    <Expression>GetAncestorOfType($FirstParagraph, "Outline", $Parent)</Expression>
+  </If>
+  <Expression>$Table = InsertObject($Parent, "Table", $FirstParagraph.index)</Expression>
+  <Expression>$Table.bordersVisible = false</Expression>
+  <While>
+    <Condition>Array_Length($Texts) &gt; 0</Condition>
+    <Expression>$Row = InsertObject($Table, "Row", 0)</Expression>
+    <Expression>$Rowtext = String_Split(Array_PopBack($Texts), "        ")</Expression>
+    <While>
+      <Condition>Array_Length($Rowtext) &gt; 0</Condition>
+      <Expression>$Linenumber = InsertObject($Row, "Cell", -1)</Expression>
+      <Expression>$Linenum = InsertObject($Linenumber, "Paragraph", -1)</Expression>
+      <Expression>$Linenum.text = ((Array_Length($Texts) + 1) + " |")</Expression>
+      <Expression>$Linenum.alignment = "right"</Expression>
+      <Expression>$Linenum.fontName = "Consolas"</Expression>
+      <Expression>$Linenum.fontColor = "#999999"</Expression>
+      <Expression>$Cell = InsertObject($Row, "Cell", -1)</Expression>
+      <Expression>$Paragraph = InsertObject($Cell, "Paragraph", -1)</Expression>
+      <Expression>$Paragraph.text = Array_PopFront($Rowtext)</Expression>
+      <Expression>$Paragraph.fontName = "Consolas"</Expression>
+      <Expression>$Paragraph.fontColor = "#1e4e79"</Expression>
+      <Expression>$Paragraph.selection = "all"</Expression>
+      <Expression>$j += 1</Expression>
+    </While>
+  </While>
+</Macro>

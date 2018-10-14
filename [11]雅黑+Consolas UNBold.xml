@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Macro name="[11]雅黑+Consolas UNBold" category="Font" description="将选中文本的中文设置为微软雅黑，英文字体设置为Consolas，字号均为11（当选中多个段落时无法工作）" version="20">
+  <Comment text="You can change fonts Family below whatever you want" />
+  <Expression>$cnFont = "微软雅黑"</Expression>
+  <Expression>$enFont = "Consolas"</Expression>
+  <Comment text="You can change font size below (-1 or 0 means don't change)" />
+  <Expression>$fontSize = 11</Expression>
+  <Comment text="If you do not want some chars use cnFont, add them here. Each char is separated by a comma." />
+  <Expression>$enChars = Array("°")</Expression>
+  <Comment text="Program Starts" />
+  <ForEach collapsed="true" var="pre">
+    <Array>QueryObjects("Text", GetCurrentPage())</Array>
+    <If>
+      <Condition>$pre.selected &amp;&amp; (String_Length($pre.value) &gt; 0)</Condition>
+      <Expression>$selOnly = true</Expression>
+    </If>
+  </ForEach>
+  <ForEach var="text">
+    <Array>QueryObjects("Text", GetCurrentPage())</Array>
+    <If>
+      <Condition>$selOnly</Condition>
+      <Expression>GetParentOfType($text, "Paragraph", $parent)</Expression>
+      <If>
+        <Condition>!($parent.selection == "none")</Condition>
+        <If>
+          <Condition>$text.selected &amp;&amp; (String_Length($text.value) &gt; 0)</Condition>
+          <ForEach var="char">
+            <Array>String_Split($text.value, "")</Array>
+            <Expression>$newText = InsertObject($parent, "Text", -1)</Expression>
+            <Expression>$newText.value = $char</Expression>
+            <Expression>$newText.bold = $text.bold</Expression>
+            <Expression>$newText.fontColor = $text.fontColor</Expression>
+            <If>
+              <Condition>$fontSize &gt; 0</Condition>
+              <Expression>$newText.fontSize = $fontSize</Expression>
+            </If>
+            <Else>
+              <Expression>$newText.fontSize = $text.fontSize</Expression>
+            </Else>
+            <Expression>$newText.highlightColor = $text.highlightColor</Expression>
+            <Expression>$newText.hyperlink = $text.hyperlink</Expression>
+            <Expression>$newText.italic = $text.italic</Expression>
+            <Expression>$newText.lang = $text.lang</Expression>
+            <Expression>$newText.strikethrough = $text.strikethrough</Expression>
+            <Expression>$newText.supersub = $text.supersub</Expression>
+            <Expression>$newText.underline = $text.underline</Expression>
+            <If>
+              <Condition>String_LessThan($char, Chr(255), false) &amp;&amp; String_GreaterThan($char, Chr(0), false)</Condition>
+              <Expression>$newText.bold = false</Expression>
+              <Expression>$newText.fontName = $enFont</Expression>
+            </If>
+            <Else>
+              <Expression>$newText.fontName = $cnFont</Expression>
+            </Else>
+            <ForEach var="enchar">
+              <Array>$enChars</Array>
+              <If>
+                <Condition>$newText.value == $enchar</Condition>
+                <Expression>$newText.bold = false</Expression>
+                <Expression>$newText.fontName = $enFont</Expression>
+              </If>
+            </ForEach>
+          </ForEach>
+        </If>
+        <Else>
+          <If>
+            <Condition>String_Length($text.value) &gt; 0</Condition>
+            <Expression>$newText = InsertObject($parent, "Text", -1)</Expression>
+            <Expression>$newText.value = $text.value</Expression>
+            <Expression>$newText.bold = $text.bold</Expression>
+            <Expression>$newText.fontColor = $text.fontColor</Expression>
+            <Expression>$newText.fontSize = $text.fontSize</Expression>
+            <Expression>$newText.highlightColor = $text.highlightColor</Expression>
+            <Expression>$newText.hyperlink = $text.hyperlink</Expression>
+            <Expression>$newText.italic = $text.italic</Expression>
+            <Expression>$newText.lang = $text.lang</Expression>
+            <Expression>$newText.strikethrough = $text.strikethrough</Expression>
+            <Expression>$newText.supersub = $text.supersub</Expression>
+            <Expression>$newText.underline = $text.underline</Expression>
+            <Expression>$newText.fontName = $text.fontName</Expression>
+          </If>
+        </Else>
+        <Expression>$text.value = ""</Expression>
+      </If>
+    </If>
+    <Else>
+      <Expression>GetParentOfType($text, "Paragraph", $parent)</Expression>
+      <ForEach var="char">
+        <Array>String_Split($text.value, "")</Array>
+        <Expression>$newText = InsertObject($parent, "Text", -1)</Expression>
+        <Expression>$newText.value = $char</Expression>
+        <Expression>$newText.bold = $text.bold</Expression>
+        <Expression>$newText.fontColor = $text.fontColor</Expression>
+        <If collapsed="true">
+          <Condition>$fontSize &gt; 0</Condition>
+          <Expression>$newText.fontSize = $fontSize</Expression>
+        </If>
+        <Else collapsed="true">
+          <Expression>$newText.fontSize = $text.fontSize</Expression>
+        </Else>
+        <Expression>$newText.highlightColor = $text.highlightColor</Expression>
+        <Expression>$newText.hyperlink = $text.hyperlink</Expression>
+        <Expression>$newText.italic = $text.italic</Expression>
+        <Expression>$newText.lang = $text.lang</Expression>
+        <Expression>$newText.strikethrough = $text.strikethrough</Expression>
+        <Expression>$newText.supersub = $text.supersub</Expression>
+        <Expression>$newText.underline = $text.underline</Expression>
+        <Comment text="en char" />
+        <If>
+          <Condition>String_LessThan($char, Chr(127), false) &amp;&amp; String_GreaterThan($char, Chr(0), false)</Condition>
+          <Expression>$newText.fontName = $enFont</Expression>
+          <Expression>$newText.bold = false</Expression>
+        </If>
+        <Else>
+          <Expression>$newText.fontName = $cnFont</Expression>
+        </Else>
+        <ForEach var="enchar">
+          <Array>$enChars</Array>
+          <If>
+            <Condition>$newText.value == $enchar</Condition>
+            <Expression>$newText.fontName = $enFont</Expression>
+            <Expression>$newText.bold = false</Expression>
+          </If>
+        </ForEach>
+      </ForEach>
+      <Expression>$text.value = ""</Expression>
+    </Else>
+  </ForEach>
+</Macro>
