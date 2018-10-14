@@ -31,7 +31,8 @@
   <While>
     <Condition>Array_Length($Texts) &gt; 0</Condition>
     <Expression>$Row = InsertObject($Table, "Row", 0)</Expression>
-    <Expression>$Rowtext = String_Split(Array_PopBack($Texts), "        ")</Expression>
+    <Expression>$Rowtext = String_Split(Array_PopBack($Texts), "
+")</Expression>
     <While>
       <Condition>Array_Length($Rowtext) &gt; 0</Condition>
       <Expression>$Linenumber = InsertObject($Row, "Cell", -1)</Expression>
